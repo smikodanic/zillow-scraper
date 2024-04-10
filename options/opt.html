@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="stylesheet" href="opt.css">
+  <title>OPTIONS PAGE</title>
+</head>
+
+<body>
+  <h1>
+    &raquo; OPTIONS PAGE &laquo;
+    <br><small>CSS Selector Tool - POC1 (parent)</small>
+  </h1>
+
+  <h4>HTML Tag Attributes</h4>
+  Select what attributes you want to have in final CSS selector result.
+  <form action="#">
+    <input id="10" type="checkbox" name="attrs" value="id"> <label for="10">id</label>
+    <br><input id="11" type="checkbox" name="attrs" value="class" checked> <label for="11">class</label>
+  </form>
+
+  <br>
+  <h4>NTH</h4>
+  Select what 'nth' you want to have in final CSS selector result.
+  <form action="#">
+    <input id="20" type="radio" name="nth" value="nth-of-type" checked> <label for="20">nth-of-type</label>
+    <input id="21" type="radio" name="nth" value="nth-child"> <label for="21">nth-child</label>
+  </form>
+
+
+  <br>
+  <h4>Debugger</h4>
+  See debug messages in the browser's console.
+  <form action="#">
+    <input id="50" type="checkbox" name="debug"> <label for="50">debug</label>
+  </form>
+
+  <br><br>
+  <button type="button" id="saveBtn">SAVE OPTIONS</button>
+
+  <!-- <script src="opt.js"></script> -->
+
+</body>
+
+</html>

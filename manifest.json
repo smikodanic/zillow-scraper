@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "zillow-scraper",
+  "description": "A tool for extracting data from zillow.com and saving it in the excel table.",
+  "version": "1.0.0",
+  "action": {
+    "default_title": "Zillow Scraper",
+    "default_popup": "./action/popup.html"
+  },
+  "content_scripts": [
+    {
+      "type": "module",
+      "matches": [
+        "https://www.zillow.com/*"
+      ],
+      "exclude_matches": [],
+      "js": [
+        "./content_scripts/foreground.js",
+        "./content_scripts/libs/domPlus.js",
+        "./content_scripts/libs/EventEmitter.js",
+        "./content_scripts/libs/FunctionFlow.js",
+        "./content_scripts/libs/jquery_3.6.0.js",
+        "./content_scripts/scraper/main.js",
+        "./content_scripts/scraper/scrollListings.js",
+        "./content_scripts/scraper/extractListings.js"
+      ],
+      "css": []
+    }
+  ],
+  "background": {
+    "service_worker": "./background/service-worker.js"
+  },
+  "icons": {
+    "16": "./icons/logo-16.png",
+    "48": "./icons/logo-48.png",
+    "128": "./icons/logo-128.png"
+  },
+  "options_page": "options/opt.html",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ]
+}
