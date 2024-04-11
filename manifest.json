@@ -22,7 +22,8 @@
         "./content_scripts/libs/jquery_3.6.0.js",
         "./content_scripts/scraper/main.js",
         "./content_scripts/scraper/scrollListings.js",
-        "./content_scripts/scraper/extractListings.js"
+        "./content_scripts/scraper/extractListings.js",
+        "./content_scripts/scraper/nextPage.js"
       ],
       "css": []
     }

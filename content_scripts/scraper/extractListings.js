@@ -1,4 +1,5 @@
 window.dex8.extractListings = async (x, lib) => {
+  const ff = lib.ff;
   const { listElemsUniq, clickElement, waitForSelector, getCurrentUrl, sleep } = lib.domPlus;
 
   console.log('----- extractListings ----');
@@ -10,6 +11,10 @@ window.dex8.extractListings = async (x, lib) => {
 
   let i = 1;
   for (const listing_elem of listing_elems) {
+    // PAUSE - 365 days
+    if (ff.status === 'pause') { await ff._delayPause(365 * 24 * 60 * 60 * 1000); }
+    if (ff.status === 'stop') { break; }
+
     console.log('START');
     // open listing
     await clickElement(listing_elem);
@@ -75,7 +80,7 @@ window.dex8.extractListings = async (x, lib) => {
     x.listings.push(listing);
     console.log('listings::', x.listings);
 
-    await sleep(3000);
+    await sleep(2100);
 
     // close listing
     const closeBtn_sel = 'button.ds-close-lightbox-icon';

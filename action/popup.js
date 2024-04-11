@@ -26,7 +26,22 @@ class Popup {
 
   startScraping() {
     console.log('Start the scraping process');
-    this.sendMessageToContentScript('start scraper');
+    this.sendMessageToContentScript('scraper/start');
+  }
+
+  pauseScraping() {
+    console.log('Pause the scraping process');
+    this.sendMessageToContentScript('scraper/pause');
+  }
+
+  stopScraping() {
+    console.log('Stop the scraping process');
+    this.sendMessageToContentScript('scraper/stop');
+  }
+
+  resumeScraping() {
+    console.log('Resume the paused scraping process');
+    this.sendMessageToContentScript('scraper/resume');
   }
 
 
@@ -45,6 +60,9 @@ class Popup {
   registerListeners() {
     $(document).ready(() => {
       $('button#startScraping').click(this.startScraping.bind(this));
+      $('button#pauseScraping').click(this.pauseScraping.bind(this));
+      $('button#stopScraping').click(this.stopScraping.bind(this));
+      $('button#resumeScraping').click(this.resumeScraping.bind(this));
     });
   }
 
