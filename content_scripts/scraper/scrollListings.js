@@ -6,4 +6,5 @@ window.dex8.scrollListings = async (x, lib) => {
   await domPlus.sleep(1300);
   console.log(' scrolling finished');
 
+  return x;
 };

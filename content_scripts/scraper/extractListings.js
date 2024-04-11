@@ -8,36 +8,74 @@ window.dex8.extractListings = async (x, lib) => {
 
   console.log('listing_hrefs::', listing_hrefs);
 
-
+  let i = 1;
   for (const listing_elem of listing_elems) {
     console.log('START');
     // open listing
     await clickElement(listing_elem);
-    await waitForSelector('h1[data-test-id="bdp-building-title"]', 5000, 'appear');
+    await waitForSelector('div.data-column-container h1', 5000, 'appear').catch(err => console.log(err.message));
 
     // extract listing data
-    const title = $('h1[data-test-id="bdp-building-title"]').text();
+    let title = '';
+    let location = '';
+    let address = '';
+    let city = '';
+    let state = '';
+    let zip = '';
 
-    const location = $('h2[data-test-id="bdp-building-address"]').text();
+
+    /// detect page type
+    const rent_price = $('span[data-testid="price"]').text();
+    console.log(`%c ${i}. rent_price: ${rent_price}`, 'background: #ffe257; color: Black');
+
+    if (!rent_price) {
+      title = $('h1[data-test-id="bdp-building-title"]').text();
+      location = $('h2[data-test-id="bdp-building-address"]').text() || $('p[data-test-id="bdp-building-address"]').text();
+    } else {
+      location = $('div[data-testid="summary"] h1').text();
+    }
+
     const location_parts = location?.split(',') || [];
-    const address = location_parts[0] || '';
-    const city = location_parts[1] || '';
-    const state_zip = location_parts[2] || '';
-    const state_zip_parts = state_zip?.trim().split(' ') || [];
-    const state = state_zip_parts[0] || '';
-    const zip = state_zip_parts[1] || '';
 
-    await waitForSelector('div.ds-listing-agent-header', 5000, 'appear');
-    let listed_by = $('div.ds-listing-agent-header').text();
-    listed_by = listed_by?.replace('Listed by ', '').trim();
+    if (location_parts.length === 3) {
+      address = location_parts[0] || '';
+      city = location_parts[1] || '';
+      const state_zip = location_parts[2] || '';
+      const state_zip_parts = state_zip?.trim().split(' ') || [];
+      state = state_zip_parts[0] || '';
+      zip = state_zip_parts[1] || '';
+    } else if (location_parts.length === 2) {
+      city = location_parts[0] || '';
+      const state_zip = location_parts[1] || '';
+      const state_zip_parts = state_zip?.trim().split(' ') || [];
+      state = state_zip_parts[0] || '';
+      zip = state_zip_parts[1] || '';
+    } else if (location_parts.length === 4) {
+      address = `${location_parts[0]} ${location_parts[1]}` || '';
+      city = location_parts[2] || '';
+      const state_zip = location_parts[3] || '';
+      const state_zip_parts = state_zip?.trim().split(' ') || [];
+      state = state_zip_parts[0] || '';
+      zip = state_zip_parts[1] || '';
+    }
 
-    const phone = $('li.ds-listing-agent-info-text').text();
+
+
+    const listed_by_elem = await waitForSelector('div.ds-listing-agent-header', 5000, 'appear').catch(err => console.log(err.message));
+    const listed_by = listed_by_elem ? $('div.ds-listing-agent-header')?.text().replace('Listed by ', '').trim() : '';
+    const phone = listed_by_elem ? $('li.ds-listing-agent-info-text').text() : '';
 
     const url = getCurrentUrl();
 
 
-    console.info(`${title} | ${address} | ${city} | ${state} | ${zip} | ${phone} | ${listed_by}`);
-    console.info(url);
+    console.log(`%c ${i}. | ${title} | ${address} | ${city} | ${state} | ${zip} | ${phone} | ${listed_by} | ${rent_price} |`, 'background: #ffe257; color: Black');
+    console.log(url);
+
+    const listing = { title, address, city, state, zip, listed_by, rent_price };
+    x.listings.push(listing);
+    console.log('listings::', x.listings);
+
+    await sleep(3000);
 
     // close listing
     const closeBtn_sel = 'button.ds-close-lightbox-icon';
@@ -48,6 +86,10 @@ window.dex8.extractListings = async (x, lib) => {
 
     // some delay
     await sleep(1300);
+
+    i++;
   }
 
+
+  return x;
 };
