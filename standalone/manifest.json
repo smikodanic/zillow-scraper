@@ -29,7 +29,7 @@
     }
   ],
   "background": {
-    "service_worker": "./background/service-worker.js"
+    "service_worker": "./background/service_worker.js"
   },
   "icons": {
     "16": "./icons/logo-16.png",

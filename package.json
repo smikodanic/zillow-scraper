@@ -1,0 +1,21 @@
+{
+  "name": "zillow-scraper",
+  "version": "1.0.0",
+  "description": "A chrome extension for extracting data from zillow.com and saving it in the excel table.",
+  "main": "index.js",
+  "scripts": {
+    "inst": "rm -rf node_modules && npm install",
+    "dev": "vite --watch -config vite.options.js && vite --watch --config vite.action.js && vite --watch --config vite.content_scripts.js && vite --watch --config vite.background.js",
+    "build": "vite build --config vite.options.js && vite build --config vite.action.js && vite build --config vite.content_scripts.js && vite build --config vite.background.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "sass": "^1.62.1",
+    "vite": "^5.2.8"
+  },
+  "dependencies": {
+    "jquery": "^3.6.0",
+    "@mikosoft/dodo": "file:../../../@mikosoft/dodo-framework/dodo"
+  }
+}
