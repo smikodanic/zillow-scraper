@@ -3,10 +3,10 @@ import { resolve } from 'path';
 export default {
   root: 'src',
   mode: 'development',
-  // publicDir: 'public', // relative to root
+  publicDir: 'public', // relative to root
   build: {
     outDir: '../dist',
-    assetsDir: 'options', // place files in outDir/assetsDir -> dist/options
+    assetsDir: 'options/assets', // place files in outDir/assetsDir -> dist/options
     emptyOutDir: true,
     rollupOptions: {
       input: {

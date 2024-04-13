@@ -5,17 +5,20 @@
   "main": "index.js",
   "scripts": {
     "inst": "rm -rf node_modules && npm install",
-    "dev": "vite --watch -config vite.options.js && vite --watch --config vite.action.js && vite --watch --config vite.content_scripts.js && vite --watch --config vite.background.js",
     "build": "vite build --config vite.options.js && vite build --config vite.action.js && vite build --config vite.content_scripts.js && vite build --config vite.background.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
     "sass": "^1.62.1",
     "vite": "^5.2.8"
   },
   "dependencies": {
+    "@mikosoft/cookie-storage": "^1.0.3",
+    "bootstrap": "^3.4.1",
+    "font-awesome": "^4.7.0",
     "jquery": "^3.6.0",
-    "@mikosoft/dodo": "file:../../../@mikosoft/dodo-framework/dodo"
+    "vue": "^3.4.21"
   }
 }

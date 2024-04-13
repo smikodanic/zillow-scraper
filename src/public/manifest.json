@@ -6,7 +6,7 @@
   "options_page": "options/opt.html",
   "action": {
     "default_title": "Zillow Scraper",
-    "default_popup": "./action/index.html"
+    "default_popup": "./action/popup.html"
   },
   "content_scripts": [
     {
