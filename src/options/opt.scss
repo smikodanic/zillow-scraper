@@ -1,0 +1,32 @@
+body {
+  background-color: #eee !important;
+  padding: 21px;
+  border: 1px solid gray;
+}
+
+div#app {
+  min-width: 300px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+
+header {
+  border: 1px solid blue;
+
+}
+
+
+main {
+  border: 1px solid green;
+  margin-top: 21px;
+  min-height: 400px;
+}
+
+
+footer {
+  border: 1px solid red;
+  flex-shrink: 0;
+}

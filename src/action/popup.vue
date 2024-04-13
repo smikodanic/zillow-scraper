@@ -29,7 +29,8 @@
 
   <footer class="row">
     <p class="text-center">
-      <a :href="url" target="_blank">Open in a new tab</a>
+      <a :href="urlPopup" target="_blank">Preview data</a> &middot;
+      <a :href="urlOptions" target="_blank">Options</a>
     </p>
   </footer>
 
@@ -48,7 +49,8 @@ export default defineComponent({
     const browserStorage = new BrowserStorage(storageOpts);
 
     // chrome extension ID
-    const url = `chrome-extension://${chrome.runtime.id}/action/popup.html`;
+    const urlPopup = `chrome-extension://${chrome.runtime.id}/action/popup.html`;
+    const urlOptions = `chrome-extension://${chrome.runtime.id}/options/opt.html`;
 
     // INIT
     let btnStart = ref(true);
@@ -128,7 +130,8 @@ export default defineComponent({
     };
 
     return {
-      url,
+      urlPopup,
+      urlOptions,
       btnStart,
       btnStop,
       btnPause,
