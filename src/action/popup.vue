@@ -3,8 +3,9 @@
     <div class="col-md-12 text-center">
       <!-- image -->
       <img src="/resources/img/zillow-long.png" height="54" alt="Zillow">
-      <br>
-      <br>
+
+      <br><br><br>
+
       <!-- commands -->
       <button class="btn btn-sm btn-primary" @click="startScraper" v-if="btnStart">
         <i class="fa fa-play"></i> START
@@ -19,7 +20,6 @@
         <i class="fa fa-stop"></i> STOP
       </button>
 
-      <br><br>
       <!-- spinner -->
       <i class="fa fa-refresh fa-spin fa-fw" style="color: gray" v-if="btnPause"></i>
     </div>
@@ -81,8 +81,8 @@ export default defineComponent({
         btnResume.value = false;
       }
       console.log("scraperStatus::", scraperStatus);
-      console.log(btnStart, btnStop, btnPause, btnResume);
     };
+
 
     let scraperStatus = browserStorage.get("scraperStatus"); // start, stop, pause
     console.log("scraperStatus::", scraperStatus);

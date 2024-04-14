@@ -1,8 +1,36 @@
+import HTTPClientBro from '@mikosoft/httpclient-bro';
+import ChromeStorage from '../libs/chromeStorage';
+
+
 const extractListings = async (x, lib) => {
   const ff = lib.ff;
+  const $ = lib.$;
   const { listElemsUniq, clickElement, waitForSelector, getCurrentUrl, sleep } = lib.domPlus;
 
   console.log('----- extractListings ----');
+  // get DEX8 JointAPI Key
+  const chromeStorage = new ChromeStorage('sync');
+  const storageObj = await chromeStorage.get(['dex8JointapiKey', 'collectionName']);
+  console.log('storageObj2::', storageObj);
+  const dex8JointapiKey = storageObj.dex8JointapiKey;
+  const collectionName = storageObj.collectionName || 'general';
+
+  // HTTP Client
+  const opts = {
+    encodeURI: false,
+    timeout: 8000,
+    responseType: '', // 'blob' for file download (https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseType)
+    retry: 3,
+    retryDelay: 5500,
+    maxRedirects: 3,
+    headers: {
+      authorization: `Bearer ${dex8JointapiKey}`,
+      accept: '*/*' // 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    }
+  };
+  const httpClientBro = new HTTPClientBro(opts);
+
+
   let listing_elems = listElemsUniq('div#grid-search-results>ul>li article>div>div>a', 'href');
   listing_elems = Array.from(listing_elems); // unique elems
   const listing_hrefs = listing_elems.map(le => le.getAttribute('href'));
@@ -16,11 +44,12 @@ const extractListings = async (x, lib) => {
     if (ff.status === 'stop') { break; }
 
     console.log('START');
-    // open listing
-    await clickElement(listing_elem);
-    await waitForSelector('div.data-column-container h1', 5000, 'appear').catch(err => console.log(err.message));
 
-    // extract listing data
+    /* open listing */
+    await clickElement(listing_elem);
+    await waitForSelector('div.data-column-container h1', 5000, 'appear').catch(err => console.error(err.message));
+
+    /* extract listing data */
     let title = '';
     let location = '';
     let address = '';
@@ -29,7 +58,7 @@ const extractListings = async (x, lib) => {
     let zip = '';
 
 
-    /// detect page type
+    // detect page type
     const rent_price = $('span[data-testid="price"]').text();
     console.log(`%c ${i}. rent_price: ${rent_price}`, 'background: #ffe257; color: Black');
 
@@ -65,28 +94,50 @@ const extractListings = async (x, lib) => {
     }
 
 
-
-    const listed_by_elem = await waitForSelector('div.ds-listing-agent-header', 5000, 'appear').catch(err => console.log(err.message));
+    const listed_by_elem = await waitForSelector('div.ds-listing-agent-header', 5000, 'appear').catch(err => console.error(err.message));
     const listed_by = listed_by_elem ? $('div.ds-listing-agent-header')?.text().replace('Listed by ', '').trim() : '';
     const phone = listed_by_elem ? $('li.ds-listing-agent-info-text').text() : '';
 
-    const url = getCurrentUrl();
+    const listing_url = getCurrentUrl();
 
 
     console.log(`%c ${i}. | ${title} | ${address} | ${city} | ${state} | ${zip} | ${phone} | ${listed_by} | ${rent_price} |`, 'background: #ffe257; color: Black');
-    console.log(url);
+    console.log(listing_url);
 
-    const listing = { title, address, city, state, zip, listed_by, rent_price };
+    const listing = { title, address, city, state, zip, listed_by, rent_price, listing_url };
     x.listings.push(listing);
-    console.log('listings::', x.listings);
+    console.log(' listing::', listing);
 
     await sleep(2100);
 
-    // close listing
+
+    /* save listing */
+    console.log(' save listings ...');
+    const apiURL = `http://localhost:8001/joint-api/mongo/661b8006581671204326cd81/${collectionName}/update`;
+    const apiBody = {
+      // moQuery: {
+      //   address: listing.address,
+      //   zip: listing.zip,
+      //   city: listing.city
+      // },
+      moQuery: { listing_url },
+      docNew: listing,
+      updOpts: {
+        new: true, // return updated document as 'result'
+        upsert: true, // whether to create the doc if it doesn't match (false)
+        runValidators: false, // validators validate the update operation against the model's schema
+        strict: false // values not defined in schema will not be saved in db (default is defined in schema options, and can be overwritten here)
+      }
+    };
+    const answer = await httpClientBro.askJSON(apiURL, 'PUT', apiBody);
+    console.log(' DEX8 JointAPI answer::', answer);
+
+
+    /* close listing */
     const closeBtn_sel = 'button.ds-close-lightbox-icon';
-    const closeBtn_elem = await waitForSelector(closeBtn_sel, 5000, 'appear');
+    const closeBtn_elem = await waitForSelector(closeBtn_sel, 5000, 'appear').catch(err => console.error(err.message));
     await clickElement(closeBtn_elem);
-    await waitForSelector(closeBtn_sel, 5000, 'disappear');
+    await waitForSelector(closeBtn_sel, 8000, 'disappear').catch(err => console.error(err.message));
     console.log('END\n\n');
 
     // some delay

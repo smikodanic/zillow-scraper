@@ -8,13 +8,12 @@ window.dex8 = {};
 let isRunning = false;
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  // define event emitter
+  // define event emitter as global variable
   const eventEmitter = new EventEmitter();
   window.dex8.eventEmitter = eventEmitter; // inject in the FunctionFlow (see main.js)
 
 
   console.log(request);
-
 
   // routes
   if (request === 'scraper/start') {

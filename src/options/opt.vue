@@ -6,7 +6,14 @@
       <div class="form-group">
         <label for="apiKey" class="col-sm-2 control-label">API Key:</label>
         <div class="col-sm-10">
-          <input type="text" id="apiKey" v-model="formFields.dex8JointapiKey" class="form-control">
+          <input type="text" id="apiKey" v-model="dex8JointapiKey" class="form-control">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="collName" class="col-sm-2 control-label">Collection (table):</label>
+        <div class="col-sm-10">
+          <input type="text" id="collName" v-model="collectionName" @keyup="removeEmptySpaces" class="form-control">
         </div>
       </div>
 
@@ -30,30 +37,37 @@ import { defineComponent, ref } from "vue";
 export default defineComponent({
   setup() {
     ///// DEFINE VARS /////
-    const formFields = ref({ dex8JointapiKey: '' });
+    const dex8JointapiKey = ref('');
+    const collectionName = ref('');
     const msg = ref('');
 
 
     ///// DEFINE FUNCS /////
     /**
-     * Get options from storage's "opts" parameter and set it on the page
+     * Get options from storage and set it on the page
      */
     const setOpts = () => {
-      chrome.storage.sync.get(['opts'], function (result) {
-        const opts = result.opts;
-        console.log('setOpts-opts::', opts);
-        formFields.value = opts && opts.dex8JointapiKey ? opts : { dex8JointapiKey: '' };
+      chrome.storage.sync.get(['dex8JointapiKey', 'collectionName'], function (result) {
+        const apiKey = result.dex8JointapiKey || '';
+        const collName = result.collectionName || '';
+        console.log('setOpts-dex8JointapiKey::', apiKey);
+        console.log('setOpts-collectionName::', collName);
+        dex8JointapiKey.value = apiKey;
+        collectionName.value = collName;
       });
     }
 
 
     /**
-    * Submit form and save in storage as 'opts' parameter.
+    * Submit form and save options in storage.
     */
     const saveOpts = () => {
-      const opts = formFields.value; // {dex8JointapiKey, }
-      console.log('saveOpts-opts::', opts);
-      chrome.storage.sync.set({ opts }, () => { });
+      const apiKey = dex8JointapiKey.value;
+      const collName = collectionName.value;
+      console.log('saveOpts-dex8JointapiKey::', apiKey);
+      console.log('saveOpts-collectionName::', collName);
+      chrome.storage.sync.set({ dex8JointapiKey: apiKey }, () => { });
+      chrome.storage.sync.set({ collectionName: collName }, () => { });
       showMessage('The options are saved!')
     };
 
@@ -69,15 +83,22 @@ export default defineComponent({
     };
 
 
+    const removeEmptySpaces = () => {
+      collectionName.value = collectionName.value.replace(' ', '_');
+    }
+
+
     ///// INIT /////
     setOpts();
 
 
     //// RETURN /////
     return {
-      formFields,
+      dex8JointapiKey,
+      collectionName,
       msg,
-      saveOpts
+      saveOpts,
+      removeEmptySpaces
     };
 
   }

@@ -1,7 +1,7 @@
 body {
   background-color: #eee !important;
   padding: 21px;
-  border: 1px solid gray;
+  // border: 1px solid gray;
 }
 
 div#app {
@@ -14,19 +14,19 @@ div#app {
 
 
 header {
-  border: 1px solid blue;
+  // border: 1px solid blue;
 
 }
 
 
 main {
-  border: 1px solid green;
+  // border: 1px solid green;
   margin-top: 21px;
   min-height: 400px;
 }
 
 
 footer {
-  border: 1px solid red;
+  // border: 1px solid red;
   flex-shrink: 0;
 }
