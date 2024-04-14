@@ -1,10 +1,11 @@
 const scrollListings = async (x, lib) => {
   const domPlus = lib.domPlus;
+  const echo = lib.echo;
 
-  console.log('----- scrollListings ----');
+  echo.log('----- scrollListings ----');
   await domPlus.scrollElement('div#search-page-list-container', 500, 1000);
   await domPlus.sleep(1300);
-  console.log(' scrolling finished');
+  echo.log(' scrolling finished');
 
   return x;
 };

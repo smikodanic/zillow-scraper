@@ -4,14 +4,14 @@ import ChromeStorage from '../libs/chromeStorage';
 
 const extractListings = async (x, lib) => {
   const ff = lib.ff;
+  const echo = lib.echo;
   const $ = lib.$;
   const { listElemsUniq, clickElement, waitForSelector, getCurrentUrl, sleep } = lib.domPlus;
 
-  console.log('----- extractListings ----');
+  echo.log('----- extractListings ----');
   // get DEX8 JointAPI Key
   const chromeStorage = new ChromeStorage('sync');
   const storageObj = await chromeStorage.get(['dex8JointapiKey', 'collectionName']);
-  console.log('storageObj2::', storageObj);
   const dex8JointapiKey = storageObj.dex8JointapiKey;
   const collectionName = storageObj.collectionName || 'general';
 
@@ -36,14 +36,13 @@ const extractListings = async (x, lib) => {
   const listing_hrefs = listing_elems.map(le => le.getAttribute('href'));
 
   console.log('listing_hrefs::', listing_hrefs);
+  echo.log(`Listings found: ${listing_hrefs.length}`);
 
   let i = 1;
   for (const listing_elem of listing_elems) {
     // PAUSE - 365 days
     if (ff.status === 'pause') { await ff._delayPause(365 * 24 * 60 * 60 * 1000); }
-    if (ff.status === 'stop') { break; }
-
-    console.log('START');
+    if (ff.status === 'stop') { echo.log('STOP'); break; }
 
     /* open listing */
     await clickElement(listing_elem);
@@ -100,9 +99,11 @@ const extractListings = async (x, lib) => {
 
     const listing_url = getCurrentUrl();
 
-
-    console.log(`%c ${i}. | ${title} | ${address} | ${city} | ${state} | ${zip} | ${phone} | ${listed_by} | ${rent_price} |`, 'background: #ffe257; color: Black');
+    const listing_msg = `${i}. | ${title} | ${address} | ${city} | ${state} | ${zip} | ${phone} | ${listed_by} | ${rent_price} |`;
     console.log(listing_url);
+    console.log(`%c ${listing_msg}`, 'background: #ffe257; color: Black');
+    echo.log(listing_url);
+    echo.log(listing_msg);
 
     const listing = { title, address, city, state, zip, listed_by, rent_price, listing_url };
     x.listings.push(listing);
@@ -138,7 +139,6 @@ const extractListings = async (x, lib) => {
     const closeBtn_elem = await waitForSelector(closeBtn_sel, 5000, 'appear').catch(err => console.error(err.message));
     await clickElement(closeBtn_elem);
     await waitForSelector(closeBtn_sel, 8000, 'disappear').catch(err => console.error(err.message));
-    console.log('END\n\n');
 
     // some delay
     await sleep(1300);

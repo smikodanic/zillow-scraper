@@ -12,6 +12,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   const eventEmitter = new EventEmitter();
   window.dex8.eventEmitter = eventEmitter; // inject in the FunctionFlow (see main.js)
 
+  // define sendresponse as global variable
+  window.dex8.sendMessage = chrome.runtime.sendMessage;
+
+
 
   console.log(request);
 

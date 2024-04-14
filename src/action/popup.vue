@@ -1,27 +1,36 @@
 <template>
   <header class="row">
-    <div class="col-md-12 text-center">
+    <div class="col-md-12">
       <!-- image -->
-      <img src="/resources/img/zillow-long.png" height="54" alt="Zillow">
-
-      <br><br><br>
+      <div class="text-center">
+        <img src="/resources/img/zillow-long.png" height="54" alt="Zillow">
+      </div>
 
       <!-- commands -->
-      <button class="btn btn-sm btn-primary" @click="startScraper" v-if="btnStart">
-        <i class="fa fa-play"></i> START
-      </button>
-      <button class="btn btn-sm btn-primary" @click="resumeScraper" v-if="btnResume">
-        <i class="fa fa-play-circle"></i> RESUME
-      </button>
-      <button class="btn btn-sm btn-primary" @click="pauseScraper" v-if="btnPause">
-        <i class="fa fa-pause"></i> PAUSE
-      </button>
-      <button class="btn btn-sm btn-primary" @click="stopScraper" v-if="btnStop">
-        <i class="fa fa-stop"></i> STOP
-      </button>
+      <div class="text-center" style="margin-top:21px;">
+        <button class="btn btn-sm btn-primary" @click="startScraper" v-if="btnStart">
+          <i class="fa fa-play"></i> START
+        </button>
+        <button class="btn btn-sm btn-primary" @click="resumeScraper" v-if="btnResume">
+          <i class="fa fa-play-circle"></i> RESUME
+        </button>
+        <button class="btn btn-sm btn-primary" @click="pauseScraper" v-if="btnPause">
+          <i class="fa fa-pause"></i> PAUSE
+        </button>
+        <button class="btn btn-sm btn-primary" @click="stopScraper" v-if="btnStop">
+          <i class="fa fa-stop"></i> STOP
+        </button>
+      </div>
 
       <!-- spinner -->
-      <i class="fa fa-refresh fa-spin fa-fw" style="color: gray" v-if="btnPause"></i>
+      <p class="text-center" style="margin-top:21px;">
+        <i class="fa fa-refresh fa-spin fa-fw" style="color: gray" v-if="btnPause"></i>
+      </p>
+
+      <!-- echo -->
+      <p class="text-center overflow-x-auto" style="margin-top:21px;">
+        <span class="text-success">{{ echoMsg }}</span>
+      </p>
     </div>
   </header>
 
@@ -57,6 +66,7 @@ export default defineComponent({
     let btnStop = ref(false);
     let btnPause = ref(false);
     let btnResume = ref(false);
+    let echoMsg = ref('');
 
     const showButtons = () => {
       if (scraperStatus === "start") {
@@ -129,6 +139,12 @@ export default defineComponent({
       });
     };
 
+    // listen for message sent from content_scripts/foreground.js
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      console.log('foreground message:', message);
+      echoMsg.value = message;
+    });
+
     return {
       urlPopup,
       urlOptions,
@@ -136,6 +152,7 @@ export default defineComponent({
       btnStop,
       btnPause,
       btnResume,
+      echoMsg,
       startScraper,
       stopScraper,
       pauseScraper,
