@@ -7,8 +7,10 @@ const saveListings = async (x, lib) => {
   console.log('----- saveListings ----');
   // get DEX8 JointAPI Key
   const chromeStorage = new ChromeStorage('sync');
-  const storageObj = await chromeStorage.get(['dex8JointapiKey', 'collectionName']);
+  const storageObj = await chromeStorage.get(['dex8JointapiKey', 'dex8JointapiUrl', 'databaseId', 'collectionName']);
   const dex8JointapiKey = storageObj.dex8JointapiKey;
+  const dex8JointapiUrl = storageObj.dex8JointapiUrl;
+  const databaseId = storageObj.databaseId;
   const collectionName = storageObj.collectionName || 'general';
 
   // save data in the MongoDB
@@ -25,7 +27,7 @@ const saveListings = async (x, lib) => {
     }
   };
   const httpClientBro = new HTTPClientBro(opts);
-  const answer = httpClientBro.askJSON(`https://localhost:8001/joint-api/mongo/661b8006581671204326cd81/${collectionName}/update`);
+  const answer = httpClientBro.askJSON(`${dex8JointapiUrl}/joint-api/mongo/${databaseId}/${collectionName}/update`);
   console.log('answer::', answer);
 
 

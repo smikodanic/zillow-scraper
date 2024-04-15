@@ -23,11 +23,13 @@ const askJSON = async (url, dex8JointapiKey, method = 'GET') => {
 const getSavedData = async () => {
   // get DEX8 JointAPI Key and the collection name
   const chromeStorage = new ChromeStorage('sync');
-  const storageObj = await chromeStorage.get(['dex8JointapiKey', 'collectionName']);
+  const storageObj = await chromeStorage.get(['dex8JointapiKey', 'dex8JointapiUrl', 'databaseId', 'collectionName']);
   const dex8JointapiKey = storageObj.dex8JointapiKey;
+  const dex8JointapiUrl = storageObj.dex8JointapiUrl;
+  const databaseId = storageObj.databaseId;
   const collectionName = storageObj.collectionName || 'general';
 
-  const apiResp = await askJSON(`http://localhost:8001/joint-api/mongo/661b8006581671204326cd81/${collectionName}/list`, dex8JointapiKey);
+  const apiResp = await askJSON(`${dex8JointapiUrl}/joint-api/mongo/${databaseId}/${collectionName}/list`, dex8JointapiKey);
 
   return apiResp;
 };
@@ -36,11 +38,13 @@ const getSavedData = async () => {
 const deleteAllSavedData = async () => {
   // get DEX8 JointAPI Key and the collection name
   const chromeStorage = new ChromeStorage('sync');
-  const storageObj = await chromeStorage.get(['dex8JointapiKey', 'collectionName']);
+  const storageObj = await chromeStorage.get(['dex8JointapiKey', 'dex8JointapiUrl', 'databaseId', 'collectionName']);
   const dex8JointapiKey = storageObj.dex8JointapiKey;
+  const dex8JointapiUrl = storageObj.dex8JointapiUrl;
+  const databaseId = storageObj.databaseId;
   const collectionName = storageObj.collectionName || 'general';
 
-  const apiResp = await askJSON(`http://localhost:8001/joint-api/mongo/661b8006581671204326cd81/${collectionName}/empty`, dex8JointapiKey, 'DELETE');
+  const apiResp = await askJSON(`${dex8JointapiUrl}/joint-api/mongo/${databaseId}/${collectionName}/empty`, dex8JointapiKey, 'DELETE');
   console.log('delete-apiresp::', apiResp);
 
   return apiResp;

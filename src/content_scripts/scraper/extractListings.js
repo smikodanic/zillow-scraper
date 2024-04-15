@@ -11,8 +11,10 @@ const extractListings = async (x, lib) => {
   sendMessage({ route: 'echo', payload: '----- extractListings ----' });
   // get DEX8 JointAPI Key and the collection name
   const chromeStorage = new ChromeStorage('sync');
-  const storageObj = await chromeStorage.get(['dex8JointapiKey', 'collectionName']);
+  const storageObj = await chromeStorage.get(['dex8JointapiKey', 'dex8JointapiUrl', 'databaseId', 'collectionName']);
   const dex8JointapiKey = storageObj.dex8JointapiKey;
+  const dex8JointapiUrl = storageObj.dex8JointapiUrl;
+  const databaseId = storageObj.databaseId;
   const collectionName = storageObj.collectionName || 'general';
 
   // HTTP Client
@@ -114,7 +116,7 @@ const extractListings = async (x, lib) => {
 
     /* save listing */
     console.log(' save listings ...');
-    const apiURL = `http://localhost:8001/joint-api/mongo/661b8006581671204326cd81/${collectionName}/update`;
+    const apiURL = `${dex8JointapiUrl}/joint-api/mongo/${databaseId}/${collectionName}/update`;
     const apiBody = {
       // moQuery: {
       //   address: listing.address,
