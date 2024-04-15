@@ -6,23 +6,21 @@ body {
 
 div#app {
   min-width: 300px;
-  min-height: 400px;
+  min-height: 220px;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
 }
 
 
 header {
   // border: 1px solid blue;
-
 }
 
 
 main {
   // border: 1px solid green;
   margin-top: 21px;
-  min-height: 400px;
+  min-height: 200px;
 }
 
 

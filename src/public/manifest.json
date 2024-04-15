@@ -30,7 +30,9 @@
     "128": "./icons/logo-128.png"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "tabs",
+    "activeTab"
   ],
   "host_permissions": [
     "*://*/*"

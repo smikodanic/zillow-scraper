@@ -16,8 +16,8 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   window.dex8.sendMessage = chrome.runtime.sendMessage;
 
 
-
   console.log(request);
+
 
   // routes
   if (request === 'scraper/start') {
@@ -39,6 +39,4 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     eventEmitter.emit('ff-start');
 
   }
-
-
 });

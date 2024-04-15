@@ -1,11 +1,11 @@
 const scrollListings = async (x, lib) => {
   const domPlus = lib.domPlus;
-  const echo = lib.echo;
+  const sendMessage = lib.sendMessage;
 
-  echo.log('----- scrollListings ----');
+  sendMessage({ route: 'echo', payload: '----- scrollListings ----' });
   await domPlus.scrollElement('div#search-page-list-container', 500, 1000);
   await domPlus.sleep(1300);
-  echo.log(' scrolling finished');
+  sendMessage({ route: 'echo', payload: 'scrolling finished' });
 
   return x;
 };
