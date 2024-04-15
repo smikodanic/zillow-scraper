@@ -20,3 +20,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   }
 
 });
+
+
+console.log('chrome.action 1', chrome.action);
+chrome.action.onClicked.addListener((tab) => {
+  // Handle click event
+  console.log('Action button clicked 1');
+});
