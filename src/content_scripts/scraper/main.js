@@ -14,9 +14,6 @@ const main = async (input) => {
   // event emitter
   const eventEmitter = window.dex8.eventEmitter;
 
-  // define send message to popup method
-  const sendMessage = window.dex8.sendMessage; // send response to popup (see popup.vue)
-
 
   // functionflow
   const ff = new FunctionFlow({ debug: false, msDelay: 3400 }, eventEmitter);
@@ -28,7 +25,7 @@ const main = async (input) => {
 
   /* FF injections */
   ff.xInject(x);
-  ff.libInject({ input, domPlus, eventEmitter, ff, sendMessage, $ });
+  ff.libInject({ input, domPlus, eventEmitter, ff, $ });
 
 
   await ff.serial([scrollListings, extractListings, nextPage]);

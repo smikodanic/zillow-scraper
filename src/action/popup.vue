@@ -24,13 +24,13 @@
 
       <!-- spinner -->
       <p class="text-center" style="margin-top:21px;">
-        <i class="fa fa-refresh fa-spin fa-fw" style="color: gray" v-if="btnPause"></i>
+        <i class="fa fa-refresh fa-spin fa-fw" style="color: gray" v-if="showSpinner"></i>
       </p>
 
       <!-- echo -->
       <p class="text-center" style="margin-top:21px; white-space:nowrap; overflow-x:scroll;">
         MESSAGES
-        <br><span class="text-success">{{ echoMsg }}</span>
+        <br><span :class="echoClass">{{ echoMsg }}</span>
       </p>
     </div>
   </header>
@@ -86,9 +86,10 @@ export default defineComponent({
     let btnPause = ref(false);
     let btnResume = ref(false);
     let echoMsg = ref('');
+    let echoClass = ref('text-success');
     let savedData_count = ref(0);
     let savedData = []; // array of objects
-
+    let showSpinner = ref(false);
 
 
     const showButtons = () => {
@@ -97,32 +98,36 @@ export default defineComponent({
         btnStop.value = true;
         btnPause.value = true;
         btnResume.value = false;
+        showSpinner.value = true;
       } else if (scraperStatus === "pause") {
         btnStart.value = false;
         btnStop.value = false;
         btnPause.value = false;
         btnResume.value = true;
+        showSpinner.value = false;
       } else if (scraperStatus === "stop") {
         btnStart.value = true;
         btnStop.value = false;
         btnPause.value = false;
         btnResume.value = false;
+        showSpinner.value = false;
       } else {
         btnStart.value = true;
         btnStop.value = false;
         btnPause.value = false;
         btnResume.value = false;
+        showSpinner.value = false;
       }
-      console.log("scraperStatus::", scraperStatus);
+      console.log("[popup.vue]scraperStatus::", scraperStatus);
     };
 
 
     let scraperStatus = browserStorage.get("scraperStatus"); // start, stop, pause
-    console.log("scraperStatus::", scraperStatus);
+    console.log("[popup.vue]initial scraperStatus::", scraperStatus);
     showButtons();
 
     const startScraper = () => {
-      console.log("Start the scraping process");
+      console.log("[popup.vue] Start the scraping process");
       sendMessageToContent_script("scraper/start");
       scraperStatus = "start";
       browserStorage.put("scraperStatus", scraperStatus);
@@ -130,7 +135,7 @@ export default defineComponent({
     };
 
     const pauseScraper = () => {
-      console.log("Pause the scraping process");
+      console.log("[popup.vue] Pause the scraping process");
       sendMessageToContent_script("scraper/pause");
       scraperStatus = "pause";
       browserStorage.put("scraperStatus", scraperStatus);
@@ -138,7 +143,7 @@ export default defineComponent({
     };
 
     const stopScraper = () => {
-      console.log("Stop the scraping process");
+      console.log("[popup.vue] Stop the scraping process");
       sendMessageToContent_script("scraper/stop");
       scraperStatus = "stop";
       browserStorage.put("scraperStatus", scraperStatus);
@@ -146,35 +151,66 @@ export default defineComponent({
     };
 
     const resumeScraper = () => {
-      console.log("Resume the paused scraping process");
+      console.log("[popup.vue] Resume the paused scraping process");
       sendMessageToContent_script("scraper/resume");
       scraperStatus = "start";
       browserStorage.put("scraperStatus", scraperStatus);
       showButtons();
     };
 
+
+
     // Send message to the content script using chrome.tabs.sendMessage()
     const sendMessageToContent_script = (message) => {
-      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
         const activeTab = tabs[0]; // Query for the active tab in the current window
-        chrome.tabs.sendMessage(activeTab.id, message); // Send message to the content script of the active tab
+
+        // Send message to the content script of the active tab
+        await chrome.tabs.sendMessage(activeTab.id, message).catch(err => {
+          if (err.message === 'Could not establish connection. Receiving end does not exist.') {
+            echoMsg.value = 'Reload Zillow page and start again.';
+            // chrome.tabs.reload(activeTab.id); // reload zillow.com page
+          } else {
+            echoMsg.value = err.message;
+          }
+          echoClass.value = 'text-danger';
+          stopScraper();
+        });
+
       });
     };
 
 
+
     /*** --- ROUTER --- (listen for message sent from content_scripts/foreground.js and backgroun/service-worker.js) ***/
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      console.log('foreground message:', message);
-      if (message.route === 'echo') { echoMsg.value = message.payload || ''; }
-      if (message.route === 'saved-data') {
+      console.log('[popup.vue] foreground message:', message);
+      const payload = message.payload;
+      if (message.route === 'echo') {
+        echoMsg.value = payload;
+        echoClass.value = 'text-success';
 
-        savedData_count.value = message.payload.count || 0;
-        savedData = message.payload.data;
+      } else if (message.route === 'echo-error') { // see content_scripts/foreground.js
+        echoMsg.value = payload;
+        echoClass.value = 'text-danger';
+        stopScraper();
 
-        console.log('savedData::', savedData);
+      } else if (message.route === 'saved-data') {
 
-        createBlob(savedData)
+        if (payload.data) {
+          savedData_count.value = payload.count || 0;
+          savedData = payload.data;
+          console.log('[popup.vue]savedData::', savedData);
+          createBlob(savedData);
+
+        } else if (payload.error_message) {
+          echoMsg.value = payload.error_message;
+          echoClass.value = 'text-danger';
+          stopScraper();
+        }
+
       }
+
     });
 
 
@@ -212,7 +248,7 @@ export default defineComponent({
 
     /*** DELET ALL DATA FROM MONGO COLLECTION */
     const deleteAllData = () => {
-      chrome.runtime.sendMessage({ route: "joint-api/delete-all-data", payload: "" }); // send message to background service_worker
+      chrome.runtime.sendMessage({ route: "joint-api/delete-all-data", payload: "" }).catch(err => console.error('[popup.vue]', err.message)); // send message to background service_worker
     }
 
 
@@ -224,7 +260,9 @@ export default defineComponent({
       btnStop,
       btnPause,
       btnResume,
+      showSpinner,
       echoMsg,
+      echoClass,
       startScraper,
       stopScraper,
       pauseScraper,

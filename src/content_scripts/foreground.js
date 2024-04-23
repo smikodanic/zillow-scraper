@@ -2,7 +2,7 @@ import EventEmitter from './libs/EventEmitter.js';
 import main from './scraper/main.js';
 
 
-console.log('ZILLOW SCRAPER - forground script works !');
+console.log('[foreground.js] ZILLOW SCRAPER - forground script works !');
 
 window.dex8 = {};
 let isRunning = false;
@@ -12,20 +12,23 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   const eventEmitter = new EventEmitter();
   window.dex8.eventEmitter = eventEmitter; // inject in the FunctionFlow (see main.js)
 
-  // define sendresponse as global variable
-  window.dex8.sendMessage = chrome.runtime.sendMessage;
-
-
-  console.log(request);
+  console.log('[foreground.js] request::', request);
 
 
   // routes
   if (request === 'scraper/start') {
-    if (isRunning) { console.error('The scraper is already started'); return; }
+    if (isRunning) { console.error('[foreground.js] The scraper is already started'); return; }
     isRunning = true;
 
-    const input = {};
-    await main(input);
+    try {
+      const input = {};
+      await main(input);
+    } catch (err) {
+      const payload = `[foreground.js] main ERROR: ${err.message}`;
+      console.error(payload);
+      chrome.runtime.sendMessage({ route: 'echo-error', payload }).catch(err => console.error('[foreground.js]', err.message));
+    }
+
 
     isRunning = false;
 
@@ -39,4 +42,5 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     eventEmitter.emit('ff-start');
 
   }
+
 });

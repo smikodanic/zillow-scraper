@@ -5,7 +5,7 @@ import { getSavedData, deleteAllSavedData } from './service_worker_jointAPIcalle
 
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  console.log('service-Worker:request::', request);
+  console.log('[service_worker.js] request::', request);
   // console.log('sender::', sender);
   // sendResponse({ success: true, request }); // return message back to sender
 
@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     if (request.route === 'joint-api/delete-all-data') { await deleteAllSavedData(); }
 
     const savedData_count = await getSavedData();
-    chrome.runtime.sendMessage({ route: 'saved-data', payload: savedData_count });
+    chrome.runtime.sendMessage({ route: 'saved-data', payload: savedData_count }).catch(err => console.error('[service_worker.js]', err.message));
 
   } catch (err) {
     console.error(err);
@@ -22,8 +22,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 });
 
 
-console.log('chrome.action 1', chrome.action);
-chrome.action.onClicked.addListener((tab) => {
-  // Handle click event
-  console.log('Action button clicked 1');
-});
+
+
+
+// This will not work if "default_popup": "./action/popup.html" is defined in manifest.json
+// chrome.action.onClicked.addListener((tab) => {
+//   console.log('Action button clicked 1');
+// });

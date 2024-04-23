@@ -52,7 +52,7 @@ import { defineComponent, ref } from "vue";
 export default defineComponent({
   setup() {
     ///// DEFINE VARS /////
-    const dex8JointapiKey = ref('G9GD3G9A5D');
+    const dex8JointapiKey = ref('I7IF7ZF336');
     const dex8JointapiUrl = ref('https://api.dex8.com');
     const databaseId = ref('661a8f9ee1bda93712d1905c');
     const collectionName = ref('');

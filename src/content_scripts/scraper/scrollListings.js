@@ -1,11 +1,10 @@
 const scrollListings = async (x, lib) => {
   const domPlus = lib.domPlus;
-  const sendMessage = lib.sendMessage;
 
-  sendMessage({ route: 'echo', payload: '----- scrollListings ----' });
+  chrome.runtime.sendMessage({ route: 'echo', payload: '----- scrollListings ----' }).catch(err => console.error('[scrollListings.js]', err.message));
   await domPlus.scrollElement('div#search-page-list-container', 500, 1000);
   await domPlus.sleep(1300);
-  sendMessage({ route: 'echo', payload: 'scrolling finished' });
+  chrome.runtime.sendMessage({ route: 'echo', payload: 'scrolling finished' }).catch(err => console.error('[scrollListings.js]', err.message));
 
   return x;
 };

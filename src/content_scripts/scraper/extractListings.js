@@ -4,11 +4,10 @@ import ChromeStorage from '../libs/chromeStorage';
 
 const extractListings = async (x, lib) => {
   const ff = lib.ff;
-  const sendMessage = lib.sendMessage;
   const $ = lib.$;
   const { listElemsUniq, clickElement, waitForSelector, getCurrentUrl, sleep } = lib.domPlus;
 
-  sendMessage({ route: 'echo', payload: '----- extractListings ----' });
+  chrome.runtime.sendMessage({ route: 'echo', payload: '----- extractListings ----' }).catch(err => console.error('[extractListings.ja]', err.message));
   // get DEX8 JointAPI Key and the collection name
   const chromeStorage = new ChromeStorage('sync');
   const storageObj = await chromeStorage.get(['dex8JointapiKey', 'dex8JointapiUrl', 'databaseId', 'collectionName']);
@@ -38,13 +37,13 @@ const extractListings = async (x, lib) => {
   const listing_hrefs = listing_elems.map(le => le.getAttribute('href'));
 
   console.log('listing_hrefs::', listing_hrefs);
-  sendMessage({ route: 'echo', payload: `Listings found: ${listing_hrefs.length}` });
+  chrome.runtime.sendMessage({ route: 'echo', payload: `Listings found: ${listing_hrefs.length}` }).catch(err => console.error('[extractListings.ja]', err.message));
 
   let i = 1;
   for (const listing_elem of listing_elems) {
     // PAUSE - 365 days
     if (ff.status === 'pause') { await ff._delayPause(365 * 24 * 60 * 60 * 1000); }
-    if (ff.status === 'stop') { sendMessage({ route: 'echo', payload: 'STOP' }); break; }
+    if (ff.status === 'stop') { chrome.runtime.sendMessage({ route: 'echo', payload: 'STOP' }).catch(err => console.error('[extractListings.ja]', err.message)); break; }
 
     /* open listing */
     await clickElement(listing_elem);
@@ -96,18 +95,21 @@ const extractListings = async (x, lib) => {
 
 
     const listed_by_elem = await waitForSelector('div.ds-listing-agent-header', 5000, 'appear').catch(err => console.error(err.message));
-    const listed_by = listed_by_elem ? $('div.ds-listing-agent-header')?.text().replace('Listed by ', '').trim() : '';
-    const phone = listed_by_elem ? $('li.ds-listing-agent-info-text').text() : '';
+    const listed_by = listed_by_elem ? $('div.ds-listing-agent-header')?.text().replace('Listed by ', '').trim() : ''; // management company
+
+    const display_name = $('li > span.ds-listing-agent-display-name').text() || ''; // Leasing Agent
+    const business_name = $('li > span.ds-listing-agent-business-name').text() || ''; // Pepper Pike Capital Partners
+    const phone = $('li.ds-listing-agent-info-text').text() || ''; // (947) 223-2425
 
     const listing_url = getCurrentUrl();
 
-    const listing_msg = `${i}. | ${title} | ${address} | ${city} | ${state} | ${zip} | ${phone} | ${listed_by} | ${rent_price} |`;
+    const listing_msg = `${i}. | ${title} | ${address} | ${city} | ${state} | ${zip} || ${display_name} | ${business_name} | ${phone} | ${listed_by} | ${rent_price} |`;
     console.log(listing_url);
     console.log(`%c ${listing_msg}`, 'background: #ffe257; color: Black');
-    sendMessage({ route: 'echo', payload: listing_url });
-    sendMessage({ route: 'echo', payload: listing_msg });
+    chrome.runtime.sendMessage({ route: 'echo', payload: listing_url }).catch(err => console.error('[extractListings.ja]', err.message));
+    chrome.runtime.sendMessage({ route: 'echo', payload: listing_msg }).catch(err => console.error('[extractListings.ja]', err.message));
 
-    const listing = { title, address, city, state, zip, listed_by, rent_price, listing_url };
+    const listing = { title, address, city, state, zip, display_name, business_name, phone, listed_by, rent_price, listing_url };
     x.listings.push(listing);
     console.log(' listing::', listing);
 
@@ -118,11 +120,6 @@ const extractListings = async (x, lib) => {
     console.log(' save listings ...');
     const apiURL = `${dex8JointapiUrl}/joint-api/mongo/${databaseId}/${collectionName}/update`;
     const apiBody = {
-      // moQuery: {
-      //   address: listing.address,
-      //   zip: listing.zip,
-      //   city: listing.city
-      // },
       moQuery: { listing_url },
       docNew: listing,
       updOpts: {

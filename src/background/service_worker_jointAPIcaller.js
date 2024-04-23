@@ -45,7 +45,6 @@ const deleteAllSavedData = async () => {
   const collectionName = storageObj.collectionName || 'general';
 
   const apiResp = await askJSON(`${dex8JointapiUrl}/joint-api/mongo/${databaseId}/${collectionName}/empty`, dex8JointapiKey, 'DELETE');
-  console.log('delete-apiresp::', apiResp);
 
   return apiResp;
 };
