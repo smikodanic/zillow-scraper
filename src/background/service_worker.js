@@ -13,6 +13,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     if (request.route === 'joint-api/delete-all-data') { await deleteAllSavedData(); }
 
     const savedData_count = await getSavedData();
+    console.log('savedData_count::', savedData_count);
     chrome.runtime.sendMessage({ route: 'saved-data', payload: savedData_count }).catch(err => console.error('[service_worker.js]', err.message));
 
   } catch (err) {

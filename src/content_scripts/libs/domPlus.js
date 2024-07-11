@@ -134,7 +134,7 @@ const listElemsUniq = (cssSelector, attribute) => {
 };
 
 
-const scrollPageToBottom = () => {
+const scrollPageToBottom = (timeout = 1000) => {
   return new Promise(resolve => {
     const scrollStep = () => {
       // Scroll to the bottom of the page
@@ -145,10 +145,9 @@ const scrollPageToBottom = () => {
 
       // Check if the scroll position is still not at the bottom
       if (window.innerHeight + window.pageYOffset < document.body.offsetHeight) {
-        // Call scrollStep again after a short delay
-        setTimeout(scrollStep, 1000); // Adjust the delay as needed
+        setTimeout(scrollStep, timeout);
       } else {
-        resolve(); // Resolve the promise when scrolling is complete
+        resolve();
       }
     };
 
@@ -156,6 +155,8 @@ const scrollPageToBottom = () => {
     scrollStep();
   });
 };
+
+
 
 
 /**
@@ -166,14 +167,14 @@ const scrollPageToBottom = () => {
  * @returns {Promise<void>}
  */
 const scrollElement = (cssSelector, scrollHeight, timeout) => {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     const element = document.querySelector(cssSelector);
     if (!element) {
-      throw new Error(`Element with selector "${cssSelector}" not found`);
+      reject(`Element with selector "${cssSelector}" not found`);
     }
 
     const scrollStep = () => {
-      if (scrollHeight) {
+      if (!!scrollHeight) {
         element.scrollTop += scrollHeight; // Scroll by certain height
       } else {
         element.scrollTop = element.scrollHeight; // Scroll to the bottom of the element
@@ -181,10 +182,9 @@ const scrollElement = (cssSelector, scrollHeight, timeout) => {
 
       // Check if the scroll position is still not at the bottom
       if (element.scrollTop + element.clientHeight < element.scrollHeight) {
-        // Call scrollStep again after a short delay
-        setTimeout(scrollStep, timeout); // Adjust the delay as needed
+        setTimeout(scrollStep, timeout);
       } else {
-        resolve(); // Resolve the promise when scrolling is complete
+        resolve();
       }
     };
 

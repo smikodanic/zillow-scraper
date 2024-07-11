@@ -215,14 +215,15 @@ export default defineComponent({
 
 
     /*** CSV DOWNLAD ***/
-    const createBlob = (data) => {
-      const first = data[0];
-      if (!first) { return; }
-      delete first._id;
-      delete first.__v;
-      delete first.created_at;
-      delete first.updated_at;
-      const fields = Object.keys(first) || [];
+    const createBlob = (savedData) => {
+      // const first = savedData[0];
+      // if (!first) { return; }
+      // delete first._id;
+      // delete first.__v;
+      // delete first.created_at;
+      // delete first.updated_at;
+      // const fields = Object.keys(first) || [];
+      const fields = ['address', 'city', 'state', 'zip', 'display_name', 'business_name', 'phone', 'listed_by', 'listing_url'];
       const csvOpts = {
         fields,
         fieldDelimiter: ',',
@@ -230,7 +231,7 @@ export default defineComponent({
         rowDelimiter: '\n'
       };
       const csv = new Csv(csvOpts);
-      const csvString = fields + '\n' + csv._rows2str(data); // Convert the JSON data to a CSV string
+      const csvString = fields + '\n' + csv._rows2str(savedData); // Convert the JSON data to a CSV string
       const blob = new Blob([csvString], { type: 'text/csv' }); // Create a Blob object from the CSV string
 
       const url = URL.createObjectURL(blob); // Create a URL for the Blob object
